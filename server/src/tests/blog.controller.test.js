@@ -38,7 +38,7 @@ beforeAll(async () => {
         .post('/api/v1/users/register')
         .send(mockUser);
    
-});
+},20000);
 
 afterAll(async () => {
     await Blog.deleteMany({});
@@ -166,7 +166,7 @@ describe('Create Blog Post Endpoint ',  () => {
             .field('category',mockBlog.category);
     
         expect(res.status).toBe(401);
-        // TODO expect(res.body).toHaveProperty('message', 'Unauthorized request');
+        expect(res.body).toHaveProperty('message', 'Unauthorized');
     
         // Invalid token scenario
         const res2 = await request(app)
@@ -176,7 +176,7 @@ describe('Create Blog Post Endpoint ',  () => {
             .field('content', mockBlog.content);
     
         expect(res2.status).toBe(401);
-        // TODO expect(res2.body).toHaveProperty('message', 'Invalid or expired token');
+        expect(res2.body).toHaveProperty('message', 'Unauthorized');
     }, 20000);
 });
 
@@ -201,14 +201,14 @@ describe('Get Blog Endpoints', () => {
         .set('Authorization', 'Bearer invalidToken');
         
         expect(res.status).toBe(401);
-        // TODO expect(res2.body).toHaveProperty('message', 'Invalid or expired token');
+        expect(res.body).toHaveProperty('message', 'Unauthorized');
     }, 20000);
 
     test('Negative Test: Missing Access Token', async () => {
         const res = await request(app)
             .get('/api/v1/blogs/');
         expect(res.status).toBe(401);
-        // TODO expect(res.body).toHaveProperty('message', 'Authorization token is required');
+        expect(res.body).toHaveProperty('message', 'Unauthorized');
     });
 
     describe('Tests for get blog by id', () => {
@@ -251,13 +251,13 @@ describe('Get Blog Endpoints', () => {
                 .get(`/api/v1/blogs/${blog._id}`)
                 .send();
             expect(res.status).toBe(401);
-            // TODO expect(res.body).toHaveProperty('message', 'Authorization token is required');
+            expect(res.body).toHaveProperty('message', 'Unauthorized');
 
             const res2 = await request(app)
                 .get(`/api/v1/blogs/${blog._id}`)
                 .set('Authorization', 'Bearer invalidToken');
             expect(res2.status).toBe(401);
-            // TODO expect(res2.body).toHaveProperty('message', 'Invalid or expired token');
+            expect(res2.body).toHaveProperty('message', 'Unauthorized');
         });
 
         
@@ -567,6 +567,7 @@ describe('Update Blog Endpoints', () => {
         expect(blog2.content).toBe(blog.content);
         expect(blog2.category).toBe(blog.category);
     });
+
     test('Negative Test: Unauthorized Access', async () => {
         const blog = await Blog.findOne({ title: mockBlog.title });
         const res = await request(app)
@@ -574,7 +575,7 @@ describe('Update Blog Endpoints', () => {
             .send({ content: 'Updated Content' });
 
         expect(res.status).toBe(401);
-        expect(res.error).toHaveProperty('message', `cannot PATCH /api/v1/blogs/${blog._id} (401)`);
+        expect(res.error).toHaveProperty('message',  `cannot PATCH /api/v1/blogs/${blog._id} (401)`);
         
         const blog2= await Blog.findOne({title:mockBlog.title});
         expect(blog2).not.toBeNull();
@@ -589,7 +590,7 @@ describe('Update Blog Endpoints', () => {
             .send({ content: 'Updated Content' });
 
         expect(res2.status).toBe(401);
-        expect(res2.error).toHaveProperty('message', `cannot PATCH /api/v1/blogs/${blog._id} (401)`);
+        expect(res2.error).toHaveProperty('message',  `cannot PATCH /api/v1/blogs/${blog._id} (401)`);
 
         const blog3= await Blog.findOne({title:mockBlog.title});
         expect(blog3).not.toBeNull();
@@ -617,7 +618,7 @@ describe('Delete Blog Endpoints', () => {
         const res = await request(app)
             .delete(`/api/v1/blogs/${blog._id}`);
         expect(res.status).toBe(401);
-        // TODO expect(res.body).toHaveProperty('message', 'Authorization token is required');
+        expect(res.body).toHaveProperty('message', 'Unauthorized');
         const blog2= await Blog.findOne({title:mockBlog.title});
         expect(blog2).not.toBeNull();
         expect(blog2.title).toBe(blog.title);

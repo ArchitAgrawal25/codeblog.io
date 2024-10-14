@@ -36,7 +36,7 @@ beforeAll(async () => {
 
     accessToken = loginRes.body.data.accessToken;
     refreshToken = loginRes.body.data.refreshToken;
-});
+},20000);
 
 afterAll(async () => {
     await User.deleteMany({});
@@ -198,6 +198,7 @@ describe('User Logout', () => {
             .post('/api/v1/users/logout');
 
         expect(res.status).toBe(401);
+        expect(res.body).toHaveProperty('message', 'Unauthorized')
     });
 
     test('Negative Test: User Logout with Invalid Token', async () => {
@@ -206,5 +207,6 @@ describe('User Logout', () => {
             .set('Authorization', 'Bearer invalidToken');
 
         expect(res.status).toBe(401);
+        expect(res.body).toHaveProperty('message', 'Unauthorized')
     });
 });

@@ -5,7 +5,7 @@ const User = require('../models/user.model.js');
 const { json } = require('express');
 
 
-const verifyJWT = asyncHandler(async (req, _, next) => {   
+const verifyJWT = asyncHandler(async (req, res, next) => {   
   try {
     const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ","")
 
@@ -25,6 +25,7 @@ const verifyJWT = asyncHandler(async (req, _, next) => {
     req.user = user;
     next()
 } catch (error) {
+    res.status(401).json({message:"Unauthorized"})
     // throw new ApiError(401, error?.message || "Invalid Access Token")
     // console.log({error: error.message});
     throw new ApiError(401, json(error))
